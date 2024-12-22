@@ -51,6 +51,16 @@ import SwiftUI
         }
     }
     
+    func remove(_ emoji: Emoji) {
+        emojiArt.remove(emoji)
+    }
+    
+    func remove(emojiWithId id: Emoji.ID) {
+        if let emoji = emojiArt[id] {
+            emojiArt.remove(emoji)
+        }
+    }
+    
     init() {
 //        emojiArt.addEmoji("🚗", at: .init(x: -200, y: -150), size: 200)
 //        emojiArt.addEmoji("🚖", at: .init(x: 250, y: 100), size: 80)

@@ -79,6 +79,19 @@ struct EmojiArtDocumentView: View {
             .position(Emoji.Position(x: 0, y: 0).in(geometry))
         ForEach(document.emojis) { emoji in
             Text(emoji.string)
+                .contextMenu {
+                    Button(role: .destructive) {
+                        if (selectedEmojisIds.count > 1 && selectedEmojisIds.contains(emoji.id)) {
+                            selectedEmojisIds.forEach { id in
+                                document.remove(emojiWithId: id)
+                            }
+                        } else {
+                            document.remove(emoji)
+                        }
+                    } label: {
+                        Label((selectedEmojisIds.count > 1 && selectedEmojisIds.contains(emoji.id)) ? "Delete selected emojis" : "Delete emoji", systemImage: "minus.circle")
+                    }
+                }
                 .font(emoji.font)
                 .background((selectedEmojisIds.contains(emoji.id) && gestureDrag == .zero) ? .yellow.opacity(0.8) : .clear)
                 .scaleEffect(selectedEmojisIds.contains(emoji.id) ? gestureZoom : 1)
@@ -88,7 +101,6 @@ struct EmojiArtDocumentView: View {
                     tapGesture(emoji: emoji)
                         .simultaneously(with: dragGesture)
                 )
-
         }
     }
     
