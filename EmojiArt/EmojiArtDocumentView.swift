@@ -68,11 +68,55 @@ struct EmojiArtDocumentView: View {
     @ViewBuilder
     private func documentContents(in geometry: GeometryProxy) -> some View {
         AsyncImage(url: document.background)
+            .onTapGesture {
+                selectedEmojisIds.removeAll()
+            }
             .position(Emoji.Position(x: 0, y: 0).in(geometry))
         ForEach(document.emojis) { emoji in
             Text(emoji.string)
                 .font(emoji.font)
+                .background(selectedEmojisIds.contains(emoji.id) ? .yellow.opacity(0.8) : .clear)
                 .position(emoji.position.in(geometry))
+                .offset(selectedEmojisIds.contains(emoji.id) ? gestureDrag : .zero)
+                .gesture(
+                    tapGesture(emoji: emoji)
+                        .simultaneously(with: dragGesture)
+                )
+
+        }
+    }
+    
+    @GestureState private var gestureDrag: CGOffset = .zero
+    
+    private var dragGesture: some Gesture {
+        DragGesture()
+            .updating($gestureDrag) { value, gestureDrag, _ in
+                gestureDrag = value.translation
+            }
+            .onEnded { value in
+                selectedEmojisIds.forEach { id in
+                    document.move(emojiWithId: id, by: value.translation)
+                }
+            }
+    }
+    
+    private func tapGesture(emoji: Emoji) -> some Gesture {
+        TapGesture()
+            .onEnded {
+                if gestureDrag == .zero {
+                    print("tap")
+                    select(emoji)
+                }
+            }
+    }
+    
+    @State private var selectedEmojisIds: Set<Emoji.ID> = []
+    
+    private func select(_ emoji: Emoji) {
+        if selectedEmojisIds.contains(emoji.id) {
+            selectedEmojisIds.remove(emoji.id)
+        } else {
+            selectedEmojisIds.insert(emoji.id)
         }
     }
     
