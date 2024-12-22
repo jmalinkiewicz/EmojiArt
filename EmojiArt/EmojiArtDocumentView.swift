@@ -28,7 +28,7 @@ struct EmojiArtDocumentView: View {
             ZStack {
                 Color.white
                 documentContents(in: geometry)
-                    .scaleEffect(zoom * gestureZoom)
+                    .scaleEffect(zoom * (selectedEmojisIds.isEmpty ? gestureZoom : 1))
                     .offset(pan + gesturePan )
             }
             .gesture(panGesture.simultaneously(with: zoomGesture ))
@@ -48,10 +48,15 @@ struct EmojiArtDocumentView: View {
         MagnificationGesture()
             .updating($gestureZoom) { inMotionPinchScale, gestureZoom, _ in
                 gestureZoom = inMotionPinchScale
-                
             }
             .onEnded { endingPinchValue in
-                zoom *= endingPinchValue
+                if (!selectedEmojisIds.isEmpty) {
+                    selectedEmojisIds.forEach { id in
+                        document.resize(emojiWithId: id, by: endingPinchValue)
+                    }
+                } else {
+                    zoom *= endingPinchValue
+                }
             }
     }
     
@@ -76,6 +81,7 @@ struct EmojiArtDocumentView: View {
             Text(emoji.string)
                 .font(emoji.font)
                 .background((selectedEmojisIds.contains(emoji.id) && gestureDrag == .zero) ? .yellow.opacity(0.8) : .clear)
+                .scaleEffect(selectedEmojisIds.contains(emoji.id) ? gestureZoom : 1)
                 .position(emoji.position.in(geometry))
                 .offset(selectedEmojisIds.contains(emoji.id) ? gestureDrag : .zero)
                 .gesture(
