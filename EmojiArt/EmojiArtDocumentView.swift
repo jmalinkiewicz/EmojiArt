@@ -75,7 +75,7 @@ struct EmojiArtDocumentView: View {
         ForEach(document.emojis) { emoji in
             Text(emoji.string)
                 .font(emoji.font)
-                .background(selectedEmojisIds.contains(emoji.id) ? .yellow.opacity(0.8) : .clear)
+                .background((selectedEmojisIds.contains(emoji.id) && gestureDrag == .zero) ? .yellow.opacity(0.8) : .clear)
                 .position(emoji.position.in(geometry))
                 .offset(selectedEmojisIds.contains(emoji.id) ? gestureDrag : .zero)
                 .gesture(
