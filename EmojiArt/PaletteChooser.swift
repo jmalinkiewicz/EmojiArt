@@ -38,7 +38,7 @@ struct PaletteChooser: View {
             ScrollingEmojis(palette.emojis)
         }
         .id(palette.id)
-        .transition(.asymmetric(insertion: .move(edge:  .bottom), removal: .move(edge: .top)))
+        .transition(.asymmetric(insertion: .rollUp, removal: .rollUp))
     }
 }
 
